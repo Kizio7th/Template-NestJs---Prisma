@@ -1,0 +1,157 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/@prisma/postgres/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_DB_URL")
+}
+
+// schema.prisma
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique @db.VarChar(50)
+  password  String   @db.Text 
+  fullname  String?  @db.VarChar(50)
+  email     String?  @db.VarChar(50)
+  avatar    String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamp(3)
+  updatedAt DateTime @db.Timestamp(3)
+
+  userRoles UserRole[] @relation()
+  customer  Customer?
+}
+
+model Role {
+  id       Int        @id @default(autoincrement())
+  name     String     @unique @db.VarChar(50)
+  UserRole UserRole[]
+}
+
+model UserRole {
+  userId Int
+  roleId Int
+  User   User @relation(fields: [userId], references: [id])
+  Role   Role @relation(fields: [roleId], references: [id])
+
+  @@id([userId, roleId])
+}
+
+model Customer {
+  userId        Int      @id
+  gender        String   @db.VarChar(50)
+  date_of_birth DateTime @db.Timestamp(3)
+  typeId        String   @db.VarChar(50)
+  point         Int      @db.Integer
+  bio           String   @db.Text
+
+  user         User          @relation(fields: [userId], references: [id])
+  orders       Order[]       @relation()
+  customerTags CustomerTag[] @relation()
+}
+
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String @unique @db.VarChar(50)
+
+  products Product[]
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(50)
+  categoryId  Int
+  description String?  @db.Text
+  price       Decimal  @db.Decimal(10, 2)
+  created_at  DateTime @db.Timestamp(3)
+
+  category    Category      @relation(fields: [categoryId], references: [id])
+  productTags ProductTag[]  @relation()
+  OrderDetail OrderDetail[]
+}
+
+model Tag {
+  id   Int    @id @default(autoincrement())
+  name String @unique @db.VarChar(50)
+
+  customerTags CustomerTag[] @relation()
+  productTags  ProductTag[]  @relation()
+}
+
+model CustomerTag {
+  customerId Int
+  tagId      Int
+
+  customer Customer @relation(fields: [customerId], references: [userId])
+  tag      Tag      @relation(fields: [tagId], references: [id])
+
+  @@id([customerId, tagId])
+}
+
+model ProductTag {
+  productId Int
+  tagId     Int
+
+  product Product @relation(fields: [productId], references: [id])
+  tag     Tag     @relation(fields: [tagId], references: [id])
+
+  @@id([productId, tagId])
+}
+
+model Order {
+  id          Int      @id @default(autoincrement())
+  customerId  Int
+  status      String   @db.VarChar(50)
+  total_price Decimal  @db.Decimal(10, 2)
+  address     String   @db.VarChar(255)
+  order_date  DateTime @db.Timestamp(3)
+  created_at  DateTime @db.Timestamp(3)
+  updated_at  DateTime @db.Timestamp(3)
+
+  orderDetails OrderDetail[] @relation()
+  customer     Customer      @relation(fields: [customerId], references: [userId])
+  Payment      Payment[]
+  Shipping     Shipping[]
+}
+
+model OrderDetail {
+  orderId   Int
+  productId Int
+  quantity  Int @db.Integer
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@id([orderId, productId])
+}
+
+model Payment {
+  id             Int      @id @default(autoincrement())
+  orderId        Int
+  payment_date   DateTime @db.Timestamp(3)
+  payment_method String   @db.VarChar(255)
+  price          Decimal  @db.Decimal(10, 2)
+  status         String   @db.VarChar(50)
+
+  order Order @relation(fields: [orderId], references: [id])
+}
+
+model Shipping {
+  id                      Int      @id @default(autoincrement())
+  orderId                 Int
+  method                  String   @db.VarChar(50)
+  cost                    Decimal  @db.Decimal(10, 2)
+  started_shipping_date   DateTime @db.Date
+  estimated_shipping_date DateTime @db.Date
+  finished_shipping_date  DateTime @db.Date
+  status                  String   @db.VarChar(50)
+
+  order Order @relation(fields: [orderId], references: [id])
+}
