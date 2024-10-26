@@ -7,10 +7,10 @@ import { WinstonModule } from 'nest-winston';
 import { join } from 'path';
 import { format, transports } from 'winston';
 import { AppModule } from './app.module';
-import { HttpExceptionFilter } from './filter/http-exception.filter';
+import { HttpExceptionFilter } from './filters/http-exception.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { swaggerOptions, swaggerTitle, swaggerDescription } from './common';
-import { ValidationExceptionFilter } from './filter/validation-exception.filter';
+import { ValidationExceptionFilter } from './filters/validation-exception.filter';
 export async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: WinstonModule.createLogger({

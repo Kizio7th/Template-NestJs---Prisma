@@ -5,6 +5,7 @@ import { MongoPrismaService } from './mongo/mongo-prisma.service';
 
 @Module({
   providers: [PostgresPrismaService, MongoPrismaService],
+  exports: [PostgresPrismaService, MongoPrismaService]
 })
 
-export class DatabaseModule {}
+export class DatabaseModule { }

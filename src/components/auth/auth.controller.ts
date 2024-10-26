@@ -1,11 +1,9 @@
-import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
-import { RoleGuard } from '../role/role.guard';
-import { RegisterDto } from '../auth/dto/register.dto';
-import { LoginDto } from '../auth/dto/login.dto';
+import { Body, Controller, Post } from '@nestjs/common';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
 import { AuthService } from './auth.service';
-import { BaseResponse } from '../utils/baseReponse';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Response } from 'express';
+import { BaseResponse } from '../../utils/baseReponse';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 
 @ApiTags('Auth')

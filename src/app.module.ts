@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './components/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-import { UserModule } from './user/user.module';
+import { UserModule } from './components/user/user.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import { DatabaseModule } from './database/database.module';
+import { DatabaseModule } from './databases/database.module';
+import { RoleModule } from './components/role/role.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -17,6 +18,7 @@ import { DatabaseModule } from './database/database.module';
     CacheModule.register({ isGlobal: true, ttl: 30000 }),
     AuthModule,
     UserModule,
+    RoleModule,
     DatabaseModule
   ],
   controllers: [AppController],

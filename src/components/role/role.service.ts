@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PostgresPrismaService } from '../database/postgres/postgres-prisma.service';
+import { PostgresPrismaService } from '../../databases/postgres/postgres-prisma.service';
 
 @Injectable()
 export class RoleService {

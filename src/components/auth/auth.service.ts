@@ -4,9 +4,10 @@ import * as bcrypt from 'bcryptjs';
 import { UserService } from '../user/user.service';
 import { RegisterDto } from './dto/register.dto';
 import { InvalidCredentialsException, UserAlreadyExistsException } from './auth.exception';
-import { UnexpectedErrorException } from '../filter/excception';
+import { UnexpectedErrorException } from '../../utils/exception';
 import { UserInfo } from '../user/dto/userInfo.dto';
 import { LoginDto } from './dto/login.dto';
+import { UserException } from '../user/user.exception';
 @Injectable()
 export class AuthService {
   private logger = new Logger(AuthService.name);
@@ -18,21 +19,17 @@ export class AuthService {
     try {
       const checkUser = await this.userService.findByUsername(registerDto.username);
       if (checkUser) throw new UserAlreadyExistsException();
-      const user = await this.userService.createUser(registerDto)
+      const user = await this.userService.createUser(registerDto);
       return {
-        errorCode: 0,
         message: "Đăng ký thành công",
-        data: new UserInfo(user)
+        data: new UserInfo(user),
       };
     } catch (error) {
-      const exceptions = [UserAlreadyExistsException];
+      const exceptions = [UserAlreadyExistsException, UserException];
       if (!exceptions.some((exception) => error instanceof exception)) {
-        error = new UnexpectedErrorException();
+        error = new UnexpectedErrorException(error);
       }
-      return {
-        errorCode: error.errorCode ?? error.getStatus(),
-        message: error.message
-      };
+      throw error
     }
   }
   async login(loginDto: LoginDto) {
@@ -42,7 +39,6 @@ export class AuthService {
       const roles = user.userRoles.map((user: { Role: { name: any; }; }) => user.Role.name);
       const payload = { id: user.id, username: user.username, roles };
       return {
-        errorCode: 0,
         message: "Đăng nhập thành công",
         data: {
           ...new UserInfo(user),
@@ -54,10 +50,7 @@ export class AuthService {
       if (!exceptions.some((exception) => error instanceof exception)) {
         error = new UnexpectedErrorException();
       }
-      return {
-        errorCode: error.errorCode ?? error.getStatus(),
-        message: error.message
-      };
+      throw error
     }
   }
 

@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PostgresPrismaService } from '../database/postgres/postgres-prisma.service';
 import * as bcrypt from 'bcryptjs';
 import { UserException } from './user.exception';
 import { RegisterDto } from '../auth/dto/register.dto';
+import { PostgresPrismaService } from '../../databases/postgres/postgres-prisma.service';
+import { UpdateUserDto } from './dto/updateUserInfo';
 @Injectable()
 export class UserService {
   private logger = new Logger(UserService.name);
@@ -26,7 +27,7 @@ export class UserService {
       });
       return user;
     } catch (error) {
-      throw new UserException()
+      throw new UserException(error);
     }
   }
   async findAllUser() {
@@ -35,7 +36,7 @@ export class UserService {
         include: { userRoles: { include: { Role: true } } },
       });
     } catch (error) {
-      throw new UserException()
+      throw new UserException(error)
     }
   }
   async findById(id: number) {
@@ -45,7 +46,7 @@ export class UserService {
         include: { userRoles: { include: { Role: true } } },
       });
     } catch (error) {
-      throw new UserException()
+      throw new UserException(error)
     }
   }
   async findByUsername(username: string) {
@@ -57,5 +58,7 @@ export class UserService {
     } catch (error) {
       throw new UserException(error)
     }
+  }
+  async update(id: number, updateUserDto: UpdateUserDto) {
   }
 }

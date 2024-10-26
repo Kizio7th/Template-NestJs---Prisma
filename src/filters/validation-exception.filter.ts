@@ -5,12 +5,7 @@ export class ValidationExceptionFilter extends ValidationPipe {
         try {
             return await super.transform(value, metadata);
         } catch (error) {
-            const responseBody = new BaseResponse({
-                errorCode: 400,
-                message: "Có lỗi trong quá trình xác thực",
-                data: error.response.message
-            });
-            throw new BadRequestException(responseBody);
+            throw new BadRequestException("Dữ liệu đã nhập không hợp lệ");
         }
     }
 }
